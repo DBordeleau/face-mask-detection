@@ -1,4 +1,4 @@
-This was a two-phase project where I trained an AI to do image classification and make predictions about whether or not someone in a photo is wearing a face mask. A simple walkthrough of the project can be found below and a live demo of the deployed web app can be accessed at: https://face-mask-detection-qzwb.onrender.com
+This was a two-phase project where I trained an AI to do image classification and make predictions about whether or not someone in a photo is wearing a face mask. A simple walkthrough of the project can be found below and a live demo of the deployed web app can be accessed at: https://face-mask-detection-qzwb.onrender.com -- Please note that as a limitation of the free hosting, it may take a while to get a response.
 
 The Jupyter notebook I used when training the model is included in the repo as "Main.ipynb"
 
