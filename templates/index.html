@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Mask Detection</title>
+    <link href="{{url_for('static',filename='css/output.css')}}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+</head>
+
+<body class="text-center flex flex-col flex-wrap items-center justify-center mt-5">
+    <div class="">
+        <h1 class="text-xl font-bold underline">Face Mask Detection</h1>
+        <p class="leading-tight text-black font-semibold">Please upload a picture of a person to check if they are wearing a mask.</p>
+        <form id="upload-form" class="flex flex-col items-center mb-3">        
+            <div class="flex items-center justify-center w-screen md:w-full mt-4">
+                <label for="file-input" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                        </svg>
+                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                    </div>
+                    <img id="image-preview" class="hidden object-scale-down h-[64px] relative mb-5 rounded-lg" alt="Selected image preview" />
+                    <input id="file-input" type="file" class="hidden" />
+                </label>
+            </div> 
+            <button type="submit" class="text-white mt-3 bg-blue-600 shadow-lg hover:bg-blue-800 hover:scale-110 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all">Submit</button>
+        </form>
+        <div id="prediction" class="mt-3"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    <script>
+        const form = document.getElementById('upload-form');
+        const predictionDiv = document.getElementById('prediction');
+        const selectedFile = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+
+        // Show image preview when a file is selected
+        selectedFile.onchange = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    imagePreview.src = reader.result;
+                    imagePreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Form submission handling
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('file-input');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            let message;
+            if (data.prediction === 'with_mask') {
+                message = `Prediction: Person is wearing a face mask. Confidence: ${data.confidence.toFixed(2)}%`;
+            } else if (data.prediction === 'without_mask') {
+                message = `Prediction: Person is not wearing a mask. Confidence: ${data.confidence.toFixed(2)}%`;
+            } else if (data.prediction === 'mask_weared_incorrect') {
+                message = `Prediction: Person is wearing a mask, but incorrectly. Confidence: ${data.confidence.toFixed(2)}%`;
+            } else {
+                message = "Prediction failed.";
+            }
+
+            predictionDiv.innerHTML = message;
+        };
+    </script>
+</body>
+</html>
