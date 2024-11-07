@@ -59,4 +59,4 @@ def predict():
         return jsonify({'prediction': prediction, 'confidence': confidence})
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, port=4000, host='0.0.0.0')
